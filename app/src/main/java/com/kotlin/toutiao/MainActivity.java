@@ -2,11 +2,11 @@ package com.kotlin.toutiao;
 
 import android.content.res.Configuration;
 import android.graphics.Rect;
-import android.os.Build;
+
 import android.os.Bundle;
 import android.view.Display;
 import android.view.Menu;
-import android.view.MenuInflater;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -95,12 +95,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         bottom_navigation = findViewById(R.id.bottom_navigation);
         nav_view = findViewById(R.id.nav_view);
         nav_view.setNavigationItemSelectedListener(this);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                mDrawerLayout.setClipToPadding(false);
-            }
-        }
 
         getToolbar().setTitle(R.string.toutiao);
         getToolbar().inflateMenu(R.menu.menu_activity_search);

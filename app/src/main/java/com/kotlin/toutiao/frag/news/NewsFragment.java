@@ -1,5 +1,6 @@
 package com.kotlin.toutiao.frag.news;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,9 @@ import com.kotlin.toutiao.database.dao.NewsChannelDao;
 import com.kotlin.toutiao.frag.joke.JokeFragment;
 import com.kotlin.toutiao.frag.news_article.NewsArticleFragment;
 import com.kotlin.toutiao.frag.wenda.WendaFragment;
+import com.kotlin.toutiao.ui.news.NewsChannelActivity;
 import com.kotlin.toutiao.util.Constant;
+import com.kotlin.toutiao.util.RxBus;
 import com.kotlin.toutiao.util.SettingUtil;
 
 import java.util.ArrayList;
@@ -28,8 +31,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
+
 public class NewsFragment extends Fragment {
 
+    public static final String TAG = "NewsTabLayout";
     private LinearLayout linearLayout;
     private List<Fragment> fragmentList;
     private NewsChannelDao dao = new NewsChannelDao();
@@ -37,6 +44,7 @@ public class NewsFragment extends Fragment {
     private Map<String, Fragment> map = new HashMap<>();
     private ViewPager viewPager;
     private BasePagerAdapter adapter;
+    private Observable observable;
 
     public static Fragment newInstance() {
         NewsFragment fragment = new NewsFragment();
@@ -61,6 +69,8 @@ public class NewsFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                startActivity(new Intent(getActivity(), NewsChannelActivity.class));
+
             }
         });
         viewPager = view.findViewById(R.id.view_pager_news);
@@ -69,15 +79,29 @@ public class NewsFragment extends Fragment {
 
     private void initData() {
         initTips();
-
         adapter = new BasePagerAdapter(getChildFragmentManager(), fragmentList, titleList);
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(15);
 
+        observable = RxBus.getInstance().register(NewsFragment.TAG);
+        observable.subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Exception {
+                initTips();
+                adapter.notifyData(fragmentList, titleList);
+            }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        RxBus.getInstance().unRegister(NewsFragment.TAG, observable);
+        super.onDestroy();
     }
 
     private void initTips() {
         List<NewsChannelBean> channelList = dao.query(Constant.NEWS_CHANNEL_ENABLE);
+        map.clear();
         fragmentList = new ArrayList<>();
         titleList = new ArrayList<>();
         if (channelList.size() == 0) {
@@ -113,7 +137,7 @@ public class NewsFragment extends Fragment {
                     if (map.containsKey(channelId)) {
                         fragmentList.add(map.get(channelId));
                     } else {
-                        fragment = NewsArticleFragment.newInstance(channelId);
+                        fragment = NewsArticleFragment.newInstance(bean.getChannelName());
                         fragmentList.add(fragment);
                     }
                     break;

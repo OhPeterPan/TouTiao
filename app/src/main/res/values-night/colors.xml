@@ -8,4 +8,5 @@
     <color name="windowBackground">@color/Grey900</color>
     <color name="line_divider">@color/Grey700</color>
 
+    <color name="state_back">#f44336</color>
 </resources>

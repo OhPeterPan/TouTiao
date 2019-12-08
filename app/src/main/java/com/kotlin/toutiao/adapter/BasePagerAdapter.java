@@ -16,14 +16,10 @@ public class BasePagerAdapter extends FragmentStatePagerAdapter {
     private List<Fragment> fragmentList;
     private List<String> titleList;
 
-    public BasePagerAdapter(FragmentManager fm, List<Fragment> fragmentList, String[] titles) {
-        super(fm);
-        this.fragmentList = fragmentList;
-        this.titleList = new ArrayList<>(Arrays.asList(titles));
-    }
-
     public BasePagerAdapter(FragmentManager fm, List<Fragment> fragmentList, List<String> titleList) {
-        super(fm);
+        //FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT  androidx懒加载方案，
+        // 配合Fragment的onResume实现,加上这个表示fragment每次回到前台时都会调用OnResume
+        super(fm,FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.fragmentList = fragmentList;
         this.titleList = titleList;
     }
@@ -48,7 +44,13 @@ public class BasePagerAdapter extends FragmentStatePagerAdapter {
         return PagerAdapter.POSITION_NONE;
     }
 
-    public void recreateItems(List<Fragment> fragmentList, List<String> titleList) {
+ /*   public void recreateItems(List<Fragment> fragmentList, List<String> titleList) {
+        this.fragmentList = fragmentList;
+        this.titleList = titleList;
+        notifyDataSetChanged();
+    }*/
+
+    public void notifyData(List<Fragment> fragmentList, List<String> titleList) {
         this.fragmentList = fragmentList;
         this.titleList = titleList;
         notifyDataSetChanged();

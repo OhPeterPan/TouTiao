@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.view.MenuItem;
 import android.view.View;
 
 
@@ -54,6 +55,16 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
             back.setOnClickListener(this);
     }
 
+
+    /**
+     * 初始化 Toolbar
+     */
+    protected void initToolBar(boolean homeAsUpEnabled, String title) {
+        toolbar.setTitle(title);
+        setSupportActionBar(getToolbar());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(homeAsUpEnabled);
+    }
+
     public Toolbar getToolbar() {
         return toolbar;
     }
@@ -90,9 +101,9 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
         if (getSupportActionBar() != null)
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(color));
 
-         //   toolbar.setBackgroundColor(color);
+        //   toolbar.setBackgroundColor(color);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // getWindow().setStatusBarColor(color);
+            //  getWindow().setStatusBarColor(color);
             ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(getString(R.string.app_name),
                     BitmapFactory.decodeResource(getResources(), drawable),
                     color
@@ -153,6 +164,14 @@ public abstract class BaseActivity<T extends BasePresenter> extends AppCompatAct
 
     public void setView(boolean view) {
         isView = view;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

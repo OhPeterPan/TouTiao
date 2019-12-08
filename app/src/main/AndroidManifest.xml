@@ -62,7 +62,15 @@
             </intent-filter>
         </activity-alias>
 
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ui.news.NewsChannelActivity"
+            android:configChanges="orientation|screenSize|uiMode"
+            android:theme="@style/AppTheme.NoActionBar.Slidable" />
 
     </application>
 

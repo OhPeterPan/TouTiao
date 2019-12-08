@@ -54,4 +54,7 @@
     <color name="Grey700">#616161</color>
     <color name="Grey800">#424242</color>
     <color name="Grey900">#212121</color>
+
+    <color name="state_back">#2196f3</color>
+
 </resources>

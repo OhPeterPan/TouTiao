@@ -2,4 +2,6 @@
 <resources>
     <item name="back" type="id" />
     <item name="toolbar" type="id" />
+    <item name="stateRetry" type="id" />
+    <item name="recycler_view" type="id" />
 </resources>
