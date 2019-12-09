@@ -22,11 +22,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kotlin.toutiao.R;
 import com.kotlin.toutiao.bean.NewsChannelBean;
 import com.kotlin.toutiao.interfaces.IOnDragVHListener;
+import com.kotlin.toutiao.interfaces.IOnItemMoveListener;
 import com.kotlin.toutiao.ui.news.NewsChannelActivity;
 
 import java.util.List;
 
-public class NewsChannelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class NewsChannelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements IOnItemMoveListener {
     //根据需求知道有四种不同的布局
     public static final int TYPE_MY_HEADER = 0;//我的频道头部标题
     public static final int TYPE_MY = 1;//我的频道具体item
@@ -483,6 +484,14 @@ public class NewsChannelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public List<NewsChannelBean> getmOtherChannelItems() {
         return mOtherChannelItems;
+    }
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        NewsChannelBean item = mMyChannelItems.get(fromPosition - COUNT_PRE_MY_HEADER);
+        mMyChannelItems.remove(fromPosition - COUNT_PRE_MY_HEADER);
+        mMyChannelItems.add(toPosition - COUNT_PRE_MY_HEADER, item);
+        notifyItemMoved(fromPosition, toPosition);
     }
 
     /**

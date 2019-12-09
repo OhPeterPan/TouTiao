@@ -28,7 +28,8 @@ public class ItemDragHelperCallback extends ItemTouchHelper.Callback {
 
     //滑动时调用这个方法
     @Override
-    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
+                          @NonNull RecyclerView.ViewHolder target) {
         //不同的itemType之间不可互相移动
         if (viewHolder.getItemViewType() != target.getItemViewType())
             return false;
