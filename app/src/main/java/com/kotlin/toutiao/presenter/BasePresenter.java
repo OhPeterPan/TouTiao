@@ -1,5 +1,6 @@
 package com.kotlin.toutiao.presenter;
 
+import com.kotlin.toutiao.model.IModel;
 import com.kotlin.toutiao.ui.view.IView;
 
 import io.reactivex.Observable;
@@ -9,12 +10,15 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class BasePresenter<T extends IView> {
-    T view;
+public abstract class BasePresenter<T extends IView, U extends IModel> {
+    protected T view;
+    protected U model;
+
     private CompositeDisposable compositeDisposable;
 
-    public BasePresenter(T view) {
+    public BasePresenter(T view, U model) {
         this.view = view;
+        this.model = model;
         compositeDisposable = new CompositeDisposable();
     }
 
@@ -23,8 +27,9 @@ public abstract class BasePresenter<T extends IView> {
             compositeDisposable.add(disposable);
     }
 
-    private void onError(Throwable e) {
-        if (view != null)
+
+    public void onFail(Throwable e) {
+        if (null != view)
             view.onFail(e);
     }
 

@@ -14,23 +14,33 @@ import androidx.fragment.app.Fragment;
 
 import com.kotlin.toutiao.custom.State;
 import com.kotlin.toutiao.custom.view.StateLayout;
+import com.kotlin.toutiao.presenter.BasePresenter;
 
-public abstract class BaseFragment extends Fragment {
+import me.drakeet.multitype.Items;
+import me.drakeet.multitype.MultiTypeAdapter;
+
+public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
 
     private boolean isFirst = true;
     private boolean isInit = false;
     private boolean isVisible = false;
     protected StateLayout stateLayout;
 
+    protected MultiTypeAdapter adapter;
+    protected Items oldItems = new Items();
+    protected boolean canLoadMore = false;
+    protected T presenter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        if (stateLayout == null)
+        if (stateLayout == null) {
             stateLayout = new StateLayout(getContext()) {
                 @Override
                 protected void initView(View view) {
                     isFirst = false;
+
                     initFragView(view);
                 }
 
@@ -40,13 +50,25 @@ public abstract class BaseFragment extends Fragment {
                 }
             };
 
+        }
+
+
         isInit = true;
         return stateLayout;
     }
 
+    protected abstract void initPresenter();
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (null != presenter)
+            presenter.onDestroy();
+        super.onDestroy();
     }
 
     protected abstract void initFragView(View view);
@@ -64,10 +86,26 @@ public abstract class BaseFragment extends Fragment {
 
     private void initData() {
         if (isFirst && isInit && isVisible) {
+            initPresenter();
             doWork();
         }
     }
 
     protected abstract void doWork();
+
+    public void showLoading() {
+    }
+
+    public void hideLoading() {
+    }
+
+    public void onFail(Throwable throwable) {
+        setState(State.ERROR);
+    }
+
+    protected void setState(State state) {
+        if (null != stateLayout)
+            stateLayout.setState(state);
+    }
 
 }

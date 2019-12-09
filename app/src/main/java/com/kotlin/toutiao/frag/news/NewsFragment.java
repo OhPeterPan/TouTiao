@@ -137,7 +137,7 @@ public class NewsFragment extends Fragment {
                     if (map.containsKey(channelId)) {
                         fragmentList.add(map.get(channelId));
                     } else {
-                        fragment = NewsArticleFragment.newInstance(bean.getChannelName());
+                        fragment = NewsArticleFragment.newInstance(bean.getChannelId());
                         fragmentList.add(fragment);
                     }
                     break;

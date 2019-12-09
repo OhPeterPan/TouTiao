@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitCreator {
     private static volatile Retrofit retrofit;
 
-    private static Retrofit retrofitCreate() {
+    public static Retrofit retrofitCreate() {
 
         if (retrofit == null) {
             synchronized (RetrofitCreator.class) {
@@ -23,10 +23,11 @@ public class RetrofitCreator {
                             .readTimeout(60, TimeUnit.SECONDS)
                             .writeTimeout(60, TimeUnit.SECONDS)
                             .connectTimeout(60, TimeUnit.SECONDS)
+                            .retryOnConnectionFailure(true)
                             .build();
 
                     retrofit = new Retrofit.Builder()
-                            .baseUrl("")
+                            .baseUrl("http://toutiao.com/")
                             .client(okHttpClient)
                             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                             .addConverterFactory(GsonConverterFactory.create())
