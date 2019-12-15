@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.kotlin.toutiao.bean.LoadingEndBean;
 import com.kotlin.toutiao.custom.State;
 import com.kotlin.toutiao.custom.view.StateLayout;
 import com.kotlin.toutiao.presenter.BasePresenter;
@@ -29,11 +30,13 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     protected MultiTypeAdapter adapter;
     protected Items oldItems = new Items();
     protected boolean canLoadMore = false;
+    protected boolean isFirstLoad = true;//判断是否是第一次请求数据
     protected T presenter;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
 
         if (stateLayout == null) {
             stateLayout = new StateLayout(getContext()) {
@@ -48,8 +51,12 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
                 protected int getLayoutId() {
                     return getFragLayoutId();
                 }
-            };
 
+                @Override
+                protected void retryLoadData() {
+                    doWork();
+                }
+            };
         }
 
 
@@ -94,13 +101,48 @@ public abstract class BaseFragment<T extends BasePresenter> extends Fragment {
     protected abstract void doWork();
 
     public void showLoading() {
+
     }
 
     public void hideLoading() {
     }
 
     public void onFail(Throwable throwable) {
-        setState(State.ERROR);
+        if (isFirstLoad)
+            setState(State.ERROR);
+        else {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (adapter == null) return;
+                    adapter.setItems(new Items());
+                    adapter.notifyDataSetChanged();
+                    canLoadMore = false;
+                }
+            });
+        }
+    }
+
+    public void onShowNoMore() {
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (adapter == null) return;
+                if (oldItems.size() > 0) {
+                    Items newItems = new Items(oldItems);
+                    newItems.remove(newItems.size() - 1);
+                    newItems.add(new LoadingEndBean());
+                    adapter.setItems(newItems);
+                    adapter.notifyDataSetChanged();
+                } else if (oldItems.size() == 0) {
+                    oldItems.add(new LoadingEndBean());
+                    adapter.setItems(oldItems);
+                    adapter.notifyDataSetChanged();
+                }
+                canLoadMore = false;
+            }
+        });
     }
 
     protected void setState(State state) {

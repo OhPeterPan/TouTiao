@@ -138,5 +138,8 @@ public abstract class StateLayout extends FrameLayout implements View.OnClickLis
     private void changeState() {
         state = State.LOADING;
         showPage();
+        retryLoadData();
     }
+
+    protected abstract void retryLoadData();
 }

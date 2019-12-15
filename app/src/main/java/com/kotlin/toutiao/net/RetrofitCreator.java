@@ -1,5 +1,8 @@
 package com.kotlin.toutiao.net;
 
+import com.kotlin.toutiao.BuildConfig;
+import com.kotlin.toutiao.util.SdkManager;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -19,16 +22,20 @@ public class RetrofitCreator {
             synchronized (RetrofitCreator.class) {
                 if (retrofit == null) {
 
-                    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    OkHttpClient.Builder builder = new OkHttpClient.Builder()
                             .readTimeout(60, TimeUnit.SECONDS)
                             .writeTimeout(60, TimeUnit.SECONDS)
                             .connectTimeout(60, TimeUnit.SECONDS)
-                            .retryOnConnectionFailure(true)
-                            .build();
+                            .retryOnConnectionFailure(true);
+
+                    // Log 拦截器
+                    if (BuildConfig.DEBUG) {
+                        builder = SdkManager.initInterceptor(builder);
+                    }
 
                     retrofit = new Retrofit.Builder()
                             .baseUrl("http://toutiao.com/")
-                            .client(okHttpClient)
+                            .client(builder.build())
                             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                             .addConverterFactory(GsonConverterFactory.create())
                             .build();

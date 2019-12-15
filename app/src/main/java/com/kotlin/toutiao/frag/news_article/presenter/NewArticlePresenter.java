@@ -1,5 +1,7 @@
 package com.kotlin.toutiao.frag.news_article.presenter;
 
+import android.util.Log;
+
 import com.kotlin.toutiao.bean.news.MultiNewsArticleDataBean;
 import com.kotlin.toutiao.frag.news_article.INewsCallback;
 import com.kotlin.toutiao.frag.news_article.model.NewsModel;
@@ -10,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class NewArticlePresenter extends BasePresenter<INewArticleView, NewsModel> implements INewsCallback {
+import io.reactivex.disposables.Disposable;
 
+public class NewArticlePresenter extends BasePresenter<INewArticleView, NewsModel> implements INewsCallback {
+    private static final String TAG = "wak";
 
     private String category;
     private List<MultiNewsArticleDataBean> dataList = new ArrayList<>();
@@ -22,8 +26,15 @@ public class NewArticlePresenter extends BasePresenter<INewArticleView, NewsMode
         super(view, model);
     }
 
-    public void doLoadMoreData() {
+    public void doRefresh(String channelId) {
+        if (dataList.size() != 0) {
+            dataList.clear();
+            addDisposable(channelId, model.doRefresh(channelId, this));
+        }
+    }
 
+    public void doLoadMoreData(String channelId) {
+        doLoadData(channelId);
     }
 
     public void doLoadData(String channelId) {
@@ -31,7 +42,9 @@ public class NewArticlePresenter extends BasePresenter<INewArticleView, NewsMode
         if (dataList.size() > 150) {
             dataList.clear();
         }
-        model.doLoadData(channelId,this);
+        Disposable disposable = model.doLoadData(channelId, this);
+        System.out.println("wak加载"+disposable);
+        addDisposable(channelId, disposable);
     }
 
     @Override
@@ -42,6 +55,9 @@ public class NewArticlePresenter extends BasePresenter<INewArticleView, NewsMode
 
     @Override
     public void doShowNoMore() {
-
+        view.hideLoading();
+        view.onShowNoMore();
     }
+
+
 }

@@ -6,4 +6,6 @@ public interface IView {
     void hideLoading();
 
     void onFail(Throwable throwable);
+
+    void onShowNoMore();
 }

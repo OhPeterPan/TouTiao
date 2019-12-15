@@ -55,6 +55,7 @@ public class NewsArticleFragment extends BaseFragment<NewArticlePresenter> imple
 
     @Override
     protected void doWork() {
+        isFirstLoad = true;
         presenter.doLoadData(channelId);
     }
 
@@ -75,17 +76,58 @@ public class NewsArticleFragment extends BaseFragment<NewArticlePresenter> imple
             @Override
             public void onLoadMore() {
                 if (canLoadMore) {
+                    System.out.println("END：加载更多");
                     canLoadMore = false;
-                    presenter.doLoadMoreData();
+                    presenter.doLoadMoreData(channelId);
                 }
+            }
+        });
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                isFirstLoad = true;
+                int firstVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+                if (firstVisibleItemPosition == 0) {
+                    presenter.doRefresh(channelId);
+                    return;
+                }
+                recyclerView.scrollToPosition(5);
+                recyclerView.smoothScrollToPosition(0);
+
             }
         });
     }
 
     @Override
+    public void hideLoading() {
+        super.hideLoading();
+        if (refreshLayout != null && refreshLayout.isRefreshing())
+            refreshLayout.setRefreshing(false);
+        if (isFirstLoad)
+            setState(State.EMPTY);
+    }
+
+    @Override
     public void onSetAdapter(List<MultiNewsArticleDataBean> list) {
-        setState(State.SUCCESS);
-     //   System.out.println("呵呵呵呵:" + list.size());
+        System.out.println("END" + isFirstLoad);
+        if (isFirstLoad) {
+            if (null != refreshLayout && refreshLayout.isRefreshing()) {
+                refreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshLayout.setRefreshing(false);
+                    }
+                });
+            }
+            isFirstLoad = false;
+            if (null == list || list.size() == 0) {
+                setState(State.EMPTY);
+                return;
+            } else {
+                setState(State.SUCCESS);
+            }
+        }
+
         Items newItems = new Items(list);
         newItems.add(new LoadingBean());
         DiffCallback.create(oldItems, newItems, adapter);

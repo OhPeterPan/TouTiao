@@ -20,6 +20,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
@@ -49,9 +50,12 @@ public class NewsModel extends IModel {
                     @Override
                     public Observable<MultiNewsArticleDataBean> apply(@NonNull MultiNewsArticleBean multiNewsArticleBean) throws Exception {
                         List<MultiNewsArticleDataBean> dataList = new ArrayList<>();
+
                         for (MultiNewsArticleBean.DataBean dataBean : multiNewsArticleBean.getData()) {
                             dataList.add(gson.fromJson(dataBean.getContent(), MultiNewsArticleDataBean.class));
                         }
+                      //  System.out.println("END数据大小:"+dataList.size());
+                        //dataList.size()==0?Observable.<MultiNewsArticleDataBean>empty(): Observable.fromIterable(dataList);
                         return Observable.fromIterable(dataList);
                     }
                 })
@@ -100,11 +104,11 @@ public class NewsModel extends IModel {
                                 }
                             }
                         }
+                        System.out.println("END list数量:"+list.size());
                         return list;
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-
                 .subscribe(new Consumer<List<MultiNewsArticleDataBean>>() {
                     @Override
                     public void accept(@NonNull List<MultiNewsArticleDataBean> list) throws Exception {
@@ -139,4 +143,13 @@ public class NewsModel extends IModel {
         }
     }
 
+    public Disposable doRefresh(String channelId, INewsCallback callback) {
+        if (dataList.size() != 0) {
+            dataList.clear();
+            time = TimeUtil.getCurrentTimeStamp();
+        }
+        Disposable disposable = doLoadData(channelId, callback);
+        System.out.println("wak刷新:" + disposable);
+        return disposable;
+    }
 }
