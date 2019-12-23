@@ -76,7 +76,7 @@ public class NewsArticleFragment extends BaseFragment<NewArticlePresenter> imple
             @Override
             public void onLoadMore() {
                 if (canLoadMore) {
-                    System.out.println("END：加载更多");
+
                     canLoadMore = false;
                     presenter.doLoadMoreData(channelId);
                 }
@@ -109,7 +109,7 @@ public class NewsArticleFragment extends BaseFragment<NewArticlePresenter> imple
 
     @Override
     public void onSetAdapter(List<MultiNewsArticleDataBean> list) {
-        System.out.println("END" + isFirstLoad);
+
         if (isFirstLoad) {
             if (null != refreshLayout && refreshLayout.isRefreshing()) {
                 refreshLayout.post(new Runnable() {

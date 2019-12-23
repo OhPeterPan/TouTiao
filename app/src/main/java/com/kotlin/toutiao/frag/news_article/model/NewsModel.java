@@ -149,7 +149,6 @@ public class NewsModel extends IModel {
             time = TimeUtil.getCurrentTimeStamp();
         }
         Disposable disposable = doLoadData(channelId, callback);
-        System.out.println("wak刷新:" + disposable);
         return disposable;
     }
 }

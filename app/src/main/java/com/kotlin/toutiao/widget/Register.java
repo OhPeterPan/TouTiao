@@ -7,12 +7,16 @@ import com.kotlin.toutiao.bean.LoadingBean;
 import com.kotlin.toutiao.bean.LoadingEndBean;
 import com.kotlin.toutiao.bean.news.MultiNewsArticleDataBean;
 import com.kotlin.toutiao.bean.news.NewsCommentBean;
+import com.kotlin.toutiao.bean.wenda.WendaArticleDataBean;
 import com.kotlin.toutiao.binder.LoadingEndViewBinder;
 import com.kotlin.toutiao.binder.LoadingViewBinder;
 import com.kotlin.toutiao.binder.news.NewsArticleImgViewBinder;
 import com.kotlin.toutiao.binder.news.NewsArticleTextViewBinder;
 import com.kotlin.toutiao.binder.news.NewsArticleVideoViewBinder;
 import com.kotlin.toutiao.binder.news.NewsCommentViewBinder;
+import com.kotlin.toutiao.binder.wenda.WendaArticleOneImgViewBinder;
+import com.kotlin.toutiao.binder.wenda.WendaArticleTextViewBinder;
+import com.kotlin.toutiao.binder.wenda.WendaArticleThreeImgViewBinder;
 
 import me.drakeet.multitype.ClassLinker;
 import me.drakeet.multitype.ItemViewBinder;
@@ -48,8 +52,35 @@ public class Register {
                 });
         adapter.register(LoadingBean.class, new LoadingViewBinder());
         adapter.register(LoadingEndBean.class, new LoadingEndViewBinder());
-
     }
+
+    public static void registerWendaArticleItem(@NonNull MultiTypeAdapter adapter) {
+        // 一个类型对应多个 ItemViewBinder
+        adapter.register(WendaArticleDataBean.class)
+                .to(new WendaArticleTextViewBinder(),
+                        new WendaArticleOneImgViewBinder(),
+                        new WendaArticleThreeImgViewBinder())
+                .withClassLinker(new ClassLinker<WendaArticleDataBean>() {
+                    @NonNull
+                    @Override
+                    public Class<? extends ItemViewBinder<WendaArticleDataBean, ?>> index(int position, @NonNull WendaArticleDataBean item) {
+                        if (null != item.getExtraBean().getWenda_image() &&
+                                null != item.getExtraBean().getWenda_image().getThree_image_list() &&
+                                item.getExtraBean().getWenda_image().getThree_image_list().size() > 0) {
+                            return WendaArticleThreeImgViewBinder.class;
+                        }
+                        if (null != item.getExtraBean().getWenda_image() &&
+                                null != item.getExtraBean().getWenda_image().getLarge_image_list() &&
+                                item.getExtraBean().getWenda_image().getLarge_image_list().size() > 0) {
+                            return WendaArticleOneImgViewBinder.class;
+                        }
+                        return WendaArticleTextViewBinder.class;
+                    }
+                });
+        adapter.register(LoadingBean.class, new LoadingViewBinder());
+        adapter.register(LoadingEndBean.class, new LoadingEndViewBinder());
+    }
+
 // TODO: 2019/12/9 使用的时候需要打开给adapter注册布局
 
 /*    public static void registerNewsCommentItem(@NonNull MultiTypeAdapter adapter) {
@@ -90,32 +121,7 @@ public class Register {
         adapter.register(LoadingEndBean.class, new LoadingEndViewBinder());
     }
 
-    public static void registerWendaArticleItem(@NonNull MultiTypeAdapter adapter) {
-        // 一个类型对应多个 ItemViewBinder
-        adapter.register(WendaArticleDataBean.class)
-                .to(new WendaArticleTextViewBinder(),
-                        new WendaArticleOneImgViewBinder(),
-                        new WendaArticleThreeImgViewBinder())
-                .withClassLinker(new ClassLinker<WendaArticleDataBean>() {
-                    @NonNull
-                    @Override
-                    public Class<? extends ItemViewBinder<WendaArticleDataBean, ?>> index(int position, @NonNull WendaArticleDataBean item) {
-                        if (null != item.getExtraBean().getWenda_image() &&
-                                null != item.getExtraBean().getWenda_image().getThree_image_list() &&
-                                item.getExtraBean().getWenda_image().getThree_image_list().size() > 0) {
-                            return WendaArticleThreeImgViewBinder.class;
-                        }
-                        if (null != item.getExtraBean().getWenda_image() &&
-                                null != item.getExtraBean().getWenda_image().getLarge_image_list() &&
-                                item.getExtraBean().getWenda_image().getLarge_image_list().size() > 0) {
-                            return WendaArticleOneImgViewBinder.class;
-                        }
-                        return WendaArticleTextViewBinder.class;
-                    }
-                });
-        adapter.register(LoadingBean.class, new LoadingViewBinder());
-        adapter.register(LoadingEndBean.class, new LoadingEndViewBinder());
-    }
+
 
     public static void registerWendaContentItem(@NonNull MultiTypeAdapter adapter) {
         adapter.register(WendaContentBean.QuestionBean.class, new WendaContentHeaderViewBinder());

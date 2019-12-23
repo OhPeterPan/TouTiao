@@ -43,7 +43,7 @@ public class NewArticlePresenter extends BasePresenter<INewArticleView, NewsMode
             dataList.clear();
         }
         Disposable disposable = model.doLoadData(channelId, this);
-        System.out.println("wak加载"+disposable);
+      //  System.out.println("wak加载"+disposable);
         addDisposable(channelId, disposable);
     }
 

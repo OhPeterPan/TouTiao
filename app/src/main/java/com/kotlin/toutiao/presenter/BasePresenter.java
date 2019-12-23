@@ -46,4 +46,5 @@ public abstract class BasePresenter<T extends IView, U extends IModel> {
     public void onDestroy() {
         clearCompositeDisposable();
     }
+
 }
